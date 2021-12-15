@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AdventOfCode2021.Solutions
@@ -18,7 +19,11 @@ namespace AdventOfCode2021.Solutions
 
         protected override object SolvePart2()
         {
-            return FindShortestPathCostsDijkstra(AddTilesToPositions(5, 5));
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var result = FindShortestPathCostsDijkstra(AddTilesToPositions(5, 5));
+            Console.WriteLine($"Elapsed:{stopWatch.ElapsedMilliseconds}");
+            return result;
         }
 
         private Dictionary<(int x, int y), Node> AddTilesToPositions(int right, int down)
@@ -55,17 +60,15 @@ namespace AdventOfCode2021.Solutions
 
         private static int FindShortestPathCostsDijkstra(Dictionary<(int x, int y), Node> positions)
         {
-            var prioQueue = new List<Node>();
+            var prioQueue = new PriorityQueue<Node, int>();
             var startPoint = positions.First().Value;
             var endPoint = positions.Last().Value;
             startPoint.TotalCost = 0;
-            prioQueue.Add(startPoint);
+            prioQueue.Enqueue(startPoint, 0);
 
-            while (prioQueue.Any())
+            while (prioQueue.Count > 0)
             {
-                prioQueue = prioQueue.OrderBy(x => x.TotalCost).ToList();
-                var currentNode = prioQueue.First();
-                prioQueue.Remove(currentNode);
+                var currentNode = prioQueue.Dequeue();
 
                 if (currentNode.X == endPoint.X && currentNode.Y == endPoint.Y)
                 {
@@ -91,12 +94,13 @@ namespace AdventOfCode2021.Solutions
                             neighbourNode.PreviousNode = currentNode;
                         }
 
-                        if (neighbourNode.IsVisited || prioQueue.Contains(neighbourNode))
+                        if (neighbourNode.IsVisited || neighbourNode.IsQueued)
                         {
                             continue;
                         }
 
-                        prioQueue.Add(neighbourNode);
+                        neighbourNode.IsQueued = true;
+                        prioQueue.Enqueue(neighbourNode, neighbourNode.TotalCost);
                     }
                 }
 
@@ -115,5 +119,6 @@ namespace AdventOfCode2021.Solutions
         public int Cost { get; set; }
         public int TotalCost { get; set; }
         public bool IsVisited { get; set; }
+        public bool IsQueued { get; set; }
     }
 }
