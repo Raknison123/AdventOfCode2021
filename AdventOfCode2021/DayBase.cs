@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
 
 namespace AdventOfCode2021
@@ -35,8 +36,29 @@ namespace AdventOfCode2021
             InputComplete = result;
         }
 
-        public object Part1 => SolvePart1();
-        public object Part2 => SolvePart2();
+        public object Part1
+        {
+            get
+            {
+                var stopWatch = new Stopwatch();
+                stopWatch.Start();
+                var result = SolvePart1();
+                Console.WriteLine($"Time elapsed:{stopWatch.ElapsedMilliseconds}ms");
+                return result;
+            }
+        }
+
+        public object Part2
+        {
+            get
+            {
+                var stopWatch = new Stopwatch();
+                stopWatch.Start();
+                var result = SolvePart2();
+                Console.WriteLine($"Time elapsed:{stopWatch.ElapsedMilliseconds}ms");
+                return result;
+            }
+        }
 
         protected abstract object SolvePart1();
 
